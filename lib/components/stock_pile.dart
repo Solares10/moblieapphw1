@@ -12,15 +12,10 @@ class StockPile extends PositionComponent
     implements Pile {
   StockPile({super.position}) : super(size: KlondikeGame.cardSize);
 
-  /// Which cards are currently placed onto this pile. The first card in the
-  /// list is at the bottom, the last card is on top.
   final List<Card> _cards = [];
-
-  //#region Pile API
 
   @override
   bool canMoveCard(Card card, MoveMethod method) => false;
-  // Can be moved by onTapUp callback (see below).
 
   @override
   bool canAcceptCard(Card card) => false;
@@ -30,7 +25,6 @@ class StockPile extends PositionComponent
       throw StateError('cannot remove cards');
 
   @override
-  // Card cannot be removed but could have been dragged out of place.
   void returnCard(Card card) => card.priority = _cards.indexOf(card);
 
   @override
@@ -42,34 +36,28 @@ class StockPile extends PositionComponent
     _cards.add(card);
   }
 
-  //#endregion
-
   void handleTapUp(Card card) {
     final wastePile = parent!.firstChild<WastePile>()!;
     if (_cards.isEmpty) {
-      assert(card.isBaseCard, 'Stock Pile is empty, but no Base Card present');
-      card.position = position; // Force Base Card (back) into correct position.
-      wastePile.removeAllCards().reversed.forEach((card) {
-        card.flip();
-        acquireCard(card);
+      assert(card.isBaseCard);
+      card.position = position;
+      wastePile.removeAllCards().reversed.forEach((c) {
+        c.flip();
+        acquireCard(c);
       });
     } else {
       for (var i = 0; i < game.klondikeDraw; i++) {
         if (_cards.isNotEmpty) {
-          final card = _cards.removeLast();
-          card.doMoveAndFlip(
-            wastePile.position,
-            whenDone: () {
-              wastePile.acquireCard(card);
-            },
-          );
+          final c = _cards.removeLast();
+          c.doMoveAndFlip(wastePile.position, whenDone: () {
+            wastePile.acquireCard(c);
+          });
         }
       }
     }
   }
 
-  //#region Rendering
-
+  // rendering
   final _borderPaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 10
@@ -88,6 +76,4 @@ class StockPile extends PositionComponent
       _circlePaint,
     );
   }
-
-  //#endregion
 }

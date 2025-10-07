@@ -22,7 +22,10 @@ class KlondikeGame extends FlameGame<KlondikeWorld> {
     const Radius.circular(cardRadius),
   );
 
+  /// Decide when a short drag is treated as a tap
   static const double dragTolerance = cardWidth / 5;
+
+  /// RNG upper bound (used for seeds)
   static const int maxInt = 0xFFFFFFFE;
 
   KlondikeGame() : super(world: KlondikeWorld());

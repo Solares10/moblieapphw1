@@ -9,15 +9,12 @@ import 'card.dart';
 
 class FoundationPile extends PositionComponent implements Pile {
   FoundationPile(int intSuit, this.checkWin, {super.position})
-    : suit = Suit.fromInt(intSuit),
-      super(size: KlondikeGame.cardSize);
+      : suit = Suit.fromInt(intSuit),
+        super(size: KlondikeGame.cardSize);
 
   final VoidCallback checkWin;
-
   final Suit suit;
   final List<Card> _cards = [];
-
-  //#region Pile API
 
   bool get isFull => _cards.length == 13;
 
@@ -27,9 +24,9 @@ class FoundationPile extends PositionComponent implements Pile {
 
   @override
   bool canAcceptCard(Card card) {
-    final topCardRank = _cards.isEmpty ? 0 : _cards.last.rank.value;
+    final topRank = _cards.isEmpty ? 0 : _cards.last.rank.value;
     return card.suit == suit &&
-        card.rank.value == topCardRank + 1 &&
+        card.rank.value == topRank + 1 &&
         card.attachedCards.isEmpty;
   }
 
@@ -52,15 +49,10 @@ class FoundationPile extends PositionComponent implements Pile {
     card.priority = _cards.length;
     card.pile = this;
     _cards.add(card);
-    if (isFull) {
-      checkWin(); // Get KlondikeWorld to check all FoundationPiles.
-    }
+    if (isFull) checkWin();
   }
 
-  //#endregion
-
-  //#region Rendering
-
+  // rendering
   final _borderPaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 10
@@ -80,6 +72,4 @@ class FoundationPile extends PositionComponent implements Pile {
       overridePaint: _suitPaint,
     );
   }
-
-  //#endregion
 }

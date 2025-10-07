@@ -12,11 +12,9 @@ class WastePile extends PositionComponent
   final List<Card> _cards = [];
   final Vector2 _fanOffset = Vector2(KlondikeGame.cardWidth * 0.2, 0);
 
-  //#region Pile API
-
   @override
   bool canMoveCard(Card card, MoveMethod method) =>
-      _cards.isNotEmpty && card == _cards.last; // Tap and drag are both OK.
+      _cards.isNotEmpty && card == _cards.last;
 
   @override
   bool canAcceptCard(Card card) => false;
@@ -44,19 +42,14 @@ class WastePile extends PositionComponent
     _fanOutTopCards();
   }
 
-  //#endregion
-
   List<Card> removeAllCards() {
-    final cards = _cards.toList();
+    final list = _cards.toList();
     _cards.clear();
-    return cards;
+    return list;
   }
 
   void _fanOutTopCards() {
-    if (game.klondikeDraw == 1) {
-      // No fan-out in Klondike Draw 1.
-      return;
-    }
+    if (game.klondikeDraw == 1) return;
     final n = _cards.length;
     for (var i = 0; i < n; i++) {
       _cards[i].position = position;

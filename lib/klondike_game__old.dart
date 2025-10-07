@@ -22,12 +22,20 @@ class KlondikeGame extends FlameGame<KlondikeWorld> {
     const Radius.circular(cardRadius),
   );
 
+  /// Constant used to decide when a short drag is treated as a TapUp event.
   static const double dragTolerance = cardWidth / 5;
-  static const int maxInt = 0xFFFFFFFE;
 
+  /// Constant used when creating Random seed.
+  static const int maxInt = 0xFFFFFFFE; // = (2 to the power 32) - 1
+
+  // This KlondikeGame constructor also initiates the first KlondikeWorld.
   KlondikeGame() : super(world: KlondikeWorld());
 
-  int klondikeDraw = 1; // 1 or 3
+  // These three values persist between games and are starting conditions
+  // for the next game to be played in KlondikeWorld. The actual seed is
+  // computed in KlondikeWorld but is held here in case the player chooses
+  // to replay a game by selecting Action.sameDeal.
+  int klondikeDraw = 1;
   int seed = 1;
   Action action = Action.newDeal;
 }
