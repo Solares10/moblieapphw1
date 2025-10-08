@@ -2,6 +2,8 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import '../logic/card_model.dart';
 
+/// A simple, draggable + tappable playing card drawn with basic shapes/text.
+/// Uses CardModel for rank/suit and face-up/face-down state.
 class CardComponent extends PositionComponent
     with DragCallbacks, TapCallbacks, HasGameRef {
   CardComponent(this.model, {required Vector2 position})
@@ -10,6 +12,7 @@ class CardComponent extends PositionComponent
   final CardModel model;
   bool _dragging = false;
 
+  // Visual parts of the card
   late RectangleComponent _cardBg;
   late RectangleComponent _border;
   TextComponent? _tl; // top-left label
@@ -19,7 +22,7 @@ class CardComponent extends PositionComponent
   Future<void> onLoad() async {
     anchor = Anchor.topLeft;
 
-    // border (slightly bigger)
+    // Outer border
     _border = RectangleComponent(
       position: Vector2.zero(),
       size: size,
@@ -28,46 +31,56 @@ class CardComponent extends PositionComponent
     );
     add(_border);
 
-    // face color (white)
+    // Inner face (actual card body)
     _cardBg = RectangleComponent(
-      position: Vector2(2, 2),
-      size: size - Vector2(4, 4),
+      position: const Vector2(2, 2),
+      size: size - const Vector2(4, 4),
       paint: Paint()..color = const Color(0xFFF2F2F2),
       priority: 1,
     );
     add(_cardBg);
 
-    _renderFace();
+    _renderFace(); // draw rank/suit or back pattern
   }
 
+  // Rebuilds the face based on model.faceUp
   void _renderFace() {
-    // Clear old labels
+    // Clear old labels/patterns
     _tl?.removeFromParent();
     _br?.removeFromParent();
+    _cardBg.children.clear();
 
     if (model.faceUp) {
       final color = model.isRed ? const Color(0xFFB71C1C) : const Color(0xFF0D47A1);
       final label = '${model.rankLabel}${model.suitSymbol}';
 
+      // Top-left rank/suit
       _tl = TextComponent(
         text: label,
-        position: Vector2(6, 4),
+        position: const Vector2(6, 4),
         textRenderer: TextPaint(
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             height: 1.0,
-            color: color,
+            color: Colors.white, // overridden by color below
             fontFamily: 'monospace',
             fontWeight: FontWeight.w700,
           ),
+        )..style = TextStyle(
+          fontSize: 16,
+          height: 1.0,
+          color: color,
+          fontFamily: 'monospace',
+          fontWeight: FontWeight.w700,
         ),
         priority: 2,
       )..anchor = Anchor.topLeft;
       add(_tl!);
 
+      // Bottom-right (mirrored)
       _br = TextComponent(
         text: label,
-        position: size - Vector2(6, 4),
+        position: size - const Vector2(6, 4),
         textRenderer: TextPaint(
           style: TextStyle(
             fontSize: 16,
@@ -80,11 +93,10 @@ class CardComponent extends PositionComponent
         priority: 2,
       )
         ..anchor = Anchor.bottomRight
-        ..angle = 3.14159265; // upside-down
+        ..angle = 3.14159265; // upside-down for mirrored corner
       add(_br!);
 
-      // light pattern in the middle (just to look less plain)
-      // you can remove this if you want
+      // Small decorative pip in center (purely visual)
       final pip = RectangleComponent(
         position: Vector2(size.x / 2 - 8, size.y / 2 - 8),
         size: Vector2(16, 16),
@@ -93,9 +105,8 @@ class CardComponent extends PositionComponent
       );
       _cardBg.add(pip);
     } else {
-      // back of card
+      // Back of card with a simple vertical stripe pattern
       _cardBg.paint.color = const Color(0xFF1565C0);
-      // add a simple grid pattern
       for (double x = 6; x < size.x - 6; x += 8) {
         final bar = RectangleComponent(
           position: Vector2(x, 6),
@@ -108,17 +119,16 @@ class CardComponent extends PositionComponent
     }
   }
 
-  // Tap to flip
+  // Tap to flip the card
   @override
   void onTapDown(TapDownEvent event) {
     model.faceUp = !model.faceUp;
-    // reset face/background color
     _cardBg.paint.color = const Color(0xFFF2F2F2);
     _cardBg.children.clear();
     _renderFace();
   }
 
-  // Dragging
+  // Dragging logic (raise priority while dragging so it stays on top)
   @override
   void onDragStart(DragStartEvent event) {
     priority = 100;

@@ -1,14 +1,18 @@
+/// Suits used in a standard deck.
 enum Suit { clubs, diamonds, hearts, spades }
 
+/// Ranks from Ace (low) to King (high).
 enum Rank { ace, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king }
 
+/// Lightweight data model for a single playing card.
 class CardModel {
-  final Suit suit;
-  final Rank rank;
-  bool faceUp;
+  final Suit suit;     // Card suit (♣ ♦ ♥ ♠)
+  final Rank rank;     // Card rank (A–K)
+  bool faceUp;         // Whether the card is currently face-up
 
   CardModel(this.suit, this.rank, {this.faceUp = true});
 
+  /// Short label for the rank (e.g., 'A', '10', 'Q').
   String get rankLabel {
     switch (rank) {
       case Rank.ace: return 'A';
@@ -27,6 +31,7 @@ class CardModel {
     }
   }
 
+  /// Unicode symbol for the suit (e.g., '♥', '♣').
   String get suitSymbol {
     switch (suit) {
       case Suit.clubs: return '♣';
@@ -36,5 +41,6 @@ class CardModel {
     }
   }
 
+  /// Red cards are Hearts or Diamonds.
   bool get isRed => suit == Suit.hearts || suit == Suit.diamonds;
 }
